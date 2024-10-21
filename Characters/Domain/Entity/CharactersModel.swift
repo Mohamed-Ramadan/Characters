@@ -8,14 +8,15 @@
 import Foundation
 
 struct CharactersModel {
-    let info: CharactersInfoModel
+    let page: Int
     let results: [CharacterModel]
+    let totalPages, totalResults: Int
 }
 
 // MARK: - CharactersInfoModel
 struct CharactersInfoModel {
     let count, pages: Int
-    let next, prev: String
+    let next, prev: String?
 }
 
 // MARK: - CharacterModel

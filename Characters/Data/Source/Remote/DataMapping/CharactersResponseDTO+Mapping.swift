@@ -16,7 +16,7 @@ struct CharactersResponseDTO: Codable {
 // MARK: - Info
 struct Info: Codable {
     let count, pages: Int
-    let next, prev: String
+    let next, prev: String?
 }
 
 // MARK: - CharacterDTO
@@ -40,11 +40,10 @@ struct CharacterLocation: Codable {
 //MARK: Mapping To Domain
 extension CharactersResponseDTO {
     func toDomain(page: Int) -> CharactersModel {
-        return .init(info: .init(count: info.count,
-                                 pages: info.pages,
-                                 next: info.next,
-                                 prev: info.prev),
-                     results: results.map{ $0.toDomain()})
+        return .init(page: page,
+                     results: results.map{ $0.toDomain()},
+                     totalPages: info.pages,
+                     totalResults: info.count)
     }
 }
 
