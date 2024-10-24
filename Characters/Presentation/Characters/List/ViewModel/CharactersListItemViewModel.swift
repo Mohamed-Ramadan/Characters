@@ -10,6 +10,7 @@ import Foundation
 struct CharactersListItemViewModel {
     var id: Int
     var name: String
+    var status: String
     var type: String
     var imageURL: String
     var species: String
@@ -22,6 +23,7 @@ extension CharactersListItemViewModel {
         self.type = character.type
         self.imageURL = character.image
         self.species = character.species
+        self.status = character.status
     }
 }
 

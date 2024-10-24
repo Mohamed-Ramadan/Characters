@@ -6,33 +6,43 @@
 //
 
 import UIKit
+import SwiftUI
+import Combine
 
 class CharactersListItemTableViewCell: UITableViewCell {
     
     static var identifier: String { String(describing: self) }
-    
-    @IBOutlet weak var characterNameLabel: UILabel!
-    @IBOutlet weak var characterSpeciesLabel: UILabel!
-    @IBOutlet weak var characterImageView: UIImageView!
-    @IBOutlet weak var cardView: UIView!
+    var cancelable = AnyCancellable(){}
+    var didSelectItem: ((_ model: CharactersListItemViewModel)-> Void)?
     
     static func nib() -> UINib {
         let nib = UINib(nibName: CharactersListItemTableViewCell.identifier, bundle: nil)
         return nib
     }
     
+    private lazy var characterCard: CharacterCardView = {
+        let viewModel = CharacterCardViewModel()
+        return CharacterCardView(viewModel: viewModel)
+    }()
+    
     override func awakeFromNib() {
         super.awakeFromNib()
+    
+        let characterCardView = UIHostingController(rootView: characterCard)
+        contentView.addSubview(characterCardView.view)
         
-        cardView.layer.cornerRadius = 16
-        cardView.layer.borderWidth = 1
-        cardView.layer.borderColor = UIColor.lightGray.cgColor
-        cardView.clipsToBounds = true
+        characterCardView.view.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            characterCardView.view.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            characterCardView.view.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+            characterCardView.view.topAnchor.constraint(equalTo: contentView.topAnchor),
+            characterCardView.view.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)])
         
-        
-        characterImageView.layer.cornerRadius = 8
-        characterImageView.layer.borderWidth = 1
-        characterImageView.layer.borderColor = UIColor.lightGray.cgColor
+        cancelable = characterCard.didTapCharacter.sink { [weak self] in
+            print("List Item has been clicked")
+            guard let self, let character = self.characterCard.viewModel.character else { return }
+            self.didSelectItem?(character)
+        }
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {
@@ -43,14 +53,6 @@ class CharactersListItemTableViewCell: UITableViewCell {
     
     
     func configureCellWithCharacter(_ characterViewModel: CharactersListItemViewModel) {
-        characterNameLabel.text = characterViewModel.name
-        characterSpeciesLabel.text = characterViewModel.species
-        
-        let urlString = "\(characterViewModel.imageURL)"
-        print(urlString)
-        
-        if let url = URL(string: urlString) {
-            characterImageView.loadImage(from: url, identifier: "\(characterViewModel.id)")
-        }
+        characterCard.viewModel.character = characterViewModel
     }
 }

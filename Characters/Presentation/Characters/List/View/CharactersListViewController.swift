@@ -109,6 +109,9 @@ class CharactersListViewController: UIViewController {
         self.tableView.delegate = self
         self.tableView.dataSource = self
     }
+    
+    private func navigateToCharacterDetails(with character: CharacterModel) {
+    }
 }
 
 extension CharactersListViewController: UITableViewDelegate, UITableViewDataSource {
@@ -123,14 +126,15 @@ extension CharactersListViewController: UITableViewDelegate, UITableViewDataSour
         
         cell.selectionStyle = .none
         cell.configureCellWithCharacter(self.viewModel.getViewModel(for: indexPath))
+        cell.didSelectItem = { [weak self] item in
+            guard let character = self?.viewModel.didSelectItem(at: indexPath) else { return }
+            self?.navigateToCharacterDetails(with: character)
+        }
         return cell
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 150
-    }
-    
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        return 130
     }
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
