@@ -111,6 +111,8 @@ class CharactersListViewController: UIViewController {
     }
     
     private func navigateToCharacterDetails(with character: CharacterModel) {
+        let characterDetailsViewController = CharacterDetailsViewController(character: character)
+        self.navigationController?.pushViewController(characterDetailsViewController, animated: true)
     }
 }
 
