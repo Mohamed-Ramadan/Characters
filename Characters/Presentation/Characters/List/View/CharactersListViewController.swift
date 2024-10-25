@@ -6,10 +6,13 @@
 //
 
 import UIKit
+import SwiftUI
+import Combine
 
 class CharactersListViewController: UIViewController {
 
     @IBOutlet weak private var tableView: UITableView!
+    @IBOutlet weak private var filterContainerView: UIView!
     
     static var identifier: String { String(describing: self) }
         
@@ -22,22 +25,38 @@ class CharactersListViewController: UIViewController {
         return DefaultCharactersUseCase(charactersRepository: charactersRepository)
     }()
     
+    var cancelable = AnyCancellable(){}
+    private lazy var filterView: FilterView = {
+        return FilterView()
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        // Do any additional setup after loading the view.
         setupTableView()
+        setupFilterView()
         setupUI()
         bindViewModel()
-    }
-    
-    override func viewIsAppearing(_ animated: Bool) {
-        super.viewIsAppearing(animated)
-        
         loadData()
     }
     
     //MARK: - Private Methods
+    private func setupFilterView() {
+        let filterController = UIHostingController(rootView: filterView)
+        filterContainerView.addSubview(filterController.view)
+        
+        filterController.view.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            filterController.view.leadingAnchor.constraint(equalTo: filterContainerView.leadingAnchor, constant: 16),
+            filterController.view.trailingAnchor.constraint(equalTo: filterContainerView.trailingAnchor, constant: -16),
+            filterController.view.topAnchor.constraint(equalTo: filterContainerView.topAnchor),
+            filterController.view.bottomAnchor.constraint(equalTo: filterContainerView.bottomAnchor)])
+        
+        cancelable = filterView.didChangeFilter.sink { [weak self] statusFilter in
+            self?.viewModel.didSelectFilterChanged(status: statusFilter)
+        }
+    }
+    
     private func loadData() {
         self.viewModel.update()
     }
@@ -112,7 +131,8 @@ class CharactersListViewController: UIViewController {
     
     private func navigateToCharacterDetails(with character: CharacterModel) {
         let characterDetailsViewController = CharacterDetailsViewController(character: character)
-        self.navigationController?.pushViewController(characterDetailsViewController, animated: true)
+        characterDetailsViewController.modalPresentationStyle = .fullScreen
+        present(characterDetailsViewController, animated: true)
     }
 }
 

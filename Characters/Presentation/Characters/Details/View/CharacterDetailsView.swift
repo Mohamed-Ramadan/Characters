@@ -20,80 +20,82 @@ struct CharacterDetailsView: View {
     @ObservedObject var viewModel: CharacterDetailsViewModel
     
     var body: some View {
-        VStack(spacing: 30) {
-            ZStack(alignment: .topLeading) {
-                AsyncImage(url: URL(string: viewModel.character?.image ?? "")) { image in
-                    image
-                        .resizable()
-                        .cornerRadius(16)
-                } placeholder: {
-                    ProgressView()
-                }
-                .ignoresSafeArea()
+        ScrollView {
+            VStack(spacing: 30) {
+                ZStack(alignment: .topLeading) {
+                    AsyncImage(url: URL(string: viewModel.character?.image ?? "")) { image in
+                        image
+                            .resizable()
+                            .cornerRadius(16)
+                    } placeholder: {
+                        ProgressView()
+                    }
+                    .ignoresSafeArea()
                     
-
-                Button(action: {
+                    
+                    Button(action: {
                         self.presentationMode.wrappedValue.dismiss()
-                }) {
-                    ZStack(alignment: .center) {
-                        Circle()
-                            .fill(.white)
-                            .frame(width: 50, height: 50)
-                        Image(systemName: "arrow.backward")
-                            .aspectRatio(contentMode: .fit)
-                            .foregroundColor(.black)
-                            .font(.headline)
+                    }) {
+                        ZStack(alignment: .center) {
+                            Circle()
+                                .fill(.white)
+                                .frame(width: 50, height: 50)
+                            Image(systemName: "arrow.backward")
+                                .aspectRatio(contentMode: .fit)
+                                .foregroundColor(.black)
+                                .font(.headline)
+                            
+                        }
+                    }
+                    .offset(x: 20, y: 50)
+                }
+                .frame(height: 300)
+                
+                VStack(alignment: .leading, spacing: 30) {
+                    HStack(alignment: .top) {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(viewModel.character?.name ?? "")
+                                .font(.title)
+                                .fontWeight(.bold)
+                            HStack(alignment: .center) {
+                                Text(viewModel.character?.species ?? "")
+                                    .font(.title2)
+                                Circle()
+                                    .fill(.black)
+                                    .frame(width: 5, height: 5)
+                                Text(viewModel.character?.gender ?? "")
+                                    .font(.title2)
+                                    .foregroundColor(.gray)
+                            }
+                        }
+                        Spacer()
                         
+                        Text(viewModel.character?.status ?? "")
+                            .font(.body)
+                            .foregroundColor(.white)
+                            .background {
+                                Rectangle()
+                                    .fill(.blue)
+                                    .cornerRadius(17.5)
+                                    .frame(height: 35)
+                                    .padding(-15)
+                            }
+                            .padding()
+                    }
+                    
+                    HStack {
+                        Text("Location :")
+                            .font(.title2)
+                        Text(viewModel.character?.location.name ?? "")
+                            .font(.headline)
+                            .foregroundColor(.secondary)
                     }
                 }
                 .padding()
             }
-            .frame(height: 300)
-            
-            VStack(alignment: .leading, spacing: 30) {
-                HStack(alignment: .top) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(viewModel.character?.name ?? "")
-                            .font(.title)
-                            .fontWeight(.bold)
-                        HStack(alignment: .center) {
-                            Text(viewModel.character?.species ?? "")
-                                .font(.title2)
-                            Circle()
-                                .fill(.black)
-                                .frame(width: 5, height: 5)
-                            Text(viewModel.character?.gender ?? "")
-                                .font(.title2)
-                                .foregroundColor(.gray)
-                        }
-                    }
-                    Spacer()
-                    
-                    Text(viewModel.character?.status ?? "")
-                        .font(.body)
-                        .foregroundColor(.white)
-                        .background {
-                            Rectangle()
-                                .fill(.blue)
-                                .cornerRadius(17.5)
-                                .frame(height: 35)
-                                .padding(-15)
-                        }
-                        .padding()
-                }
-                
-                HStack {
-                    Text("Location :")
-                        .font(.title2)
-                    Text(viewModel.character?.location.name ?? "")
-                        .font(.headline)
-                        .foregroundColor(.secondary)
-                }
-            }
-            .padding()
+            Spacer()
         }
-        
-        Spacer()
+        .ignoresSafeArea()
     }
 }
 
