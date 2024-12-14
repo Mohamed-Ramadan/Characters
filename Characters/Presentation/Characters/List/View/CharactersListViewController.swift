@@ -11,8 +11,8 @@ import Combine
 
 class CharactersListViewController: UIViewController {
 
-    @IBOutlet weak private var tableView: UITableView!
-    @IBOutlet weak private var filterContainerView: UIView!
+    private var tableView: UITableView!
+    private var filterContainerView: UIView!
     
     static var identifier: String { String(describing: self) }
         
@@ -30,6 +30,15 @@ class CharactersListViewController: UIViewController {
         return FilterView()
     }()
     
+    // MARK: - Lifecycle
+    override func loadView() {
+        // Set up the root view and subviews programmatically
+        view = UIView()
+        view.backgroundColor = .systemBackground
+        
+        setupTableViewProgrammatically()
+        setupFilterContainerViewProgrammatically()
+    }
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -41,6 +50,32 @@ class CharactersListViewController: UIViewController {
     }
     
     //MARK: - Private Methods
+    func setupTableViewProgrammatically() {
+        tableView = UITableView()
+        tableView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(tableView)
+        
+        NSLayoutConstraint.activate([
+            tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 50),
+            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+        ])
+    }
+    
+    func setupFilterContainerViewProgrammatically() {
+        filterContainerView = UIView()
+        filterContainerView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(filterContainerView)
+        
+        NSLayoutConstraint.activate([
+            filterContainerView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            filterContainerView.heightAnchor.constraint(equalToConstant: 50),
+            filterContainerView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            filterContainerView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+        ])
+    }
+    
     private func setupFilterView() {
         let filterController = UIHostingController(rootView: filterView)
         filterContainerView.addSubview(filterController.view)
@@ -57,6 +92,7 @@ class CharactersListViewController: UIViewController {
         }
     }
     
+    // MARK: - Data Binding
     private func loadData() {
         self.viewModel.update()
     }
@@ -83,6 +119,7 @@ class CharactersListViewController: UIViewController {
         }
     }
      
+    // MARK: - Loading Handlers
     private func updateLoading(_ loading: CharactersListViewModelLoading) {
         DispatchQueue.main.async {
             switch loading {
@@ -123,7 +160,7 @@ class CharactersListViewController: UIViewController {
     }
     
     private func setupTableView() {
-        self.tableView.register(CharactersListItemTableViewCell.nib(), forCellReuseIdentifier: CharactersListItemTableViewCell.identifier)
+        self.tableView.register(CharactersListItemTableViewCell.self, forCellReuseIdentifier: CharactersListItemTableViewCell.identifier)
         self.tableView.separatorStyle = .none
         self.tableView.delegate = self
         self.tableView.dataSource = self

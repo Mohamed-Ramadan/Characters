@@ -10,47 +10,56 @@ import SwiftUI
 import Combine
 
 class CharactersListItemTableViewCell: UITableViewCell {
-    
+    // MARK: - Properties
     static var identifier: String { String(describing: self) }
     var cancelable = AnyCancellable(){}
     var didSelectItem: ((_ model: CharactersListItemViewModel)-> Void)?
-    
-    static func nib() -> UINib {
-        let nib = UINib(nibName: CharactersListItemTableViewCell.identifier, bundle: nil)
-        return nib
-    }
     
     private lazy var characterCard: CharacterCardView = {
         let viewModel = CharacterCardViewModel()
         return CharacterCardView(viewModel: viewModel)
     }()
     
-    override func awakeFromNib() {
-        super.awakeFromNib()
+    private var characterCardViewController: UIHostingController<CharacterCardView>?
     
-        let characterCardView = UIHostingController(rootView: characterCard)
-        contentView.addSubview(characterCardView.view)
+    // MARK: - Initializers
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
+        setupUI()
+        bindCharacterCardActions()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    // MARK: - UI Setup
+    private func setupUI() {
+        // Embed the SwiftUI `CharacterCardView` into the cell
+        let hostingController = UIHostingController(rootView: characterCard)
+        characterCardViewController = hostingController
         
-        characterCardView.view.translatesAutoresizingMaskIntoConstraints = false
+        guard let cardView = hostingController.view else { return }
+        cardView.translatesAutoresizingMaskIntoConstraints = false
+        contentView.addSubview(cardView)
+        
+        // Add Auto Layout constraints
         NSLayoutConstraint.activate([
-            characterCardView.view.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            characterCardView.view.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-            characterCardView.view.topAnchor.constraint(equalTo: contentView.topAnchor),
-            characterCardView.view.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)])
-        
+            cardView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            cardView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+            cardView.topAnchor.constraint(equalTo: contentView.topAnchor),
+            cardView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
+        ])
+    }
+    
+    // MARK: - Binding Actions
+    private func bindCharacterCardActions() {
         cancelable = characterCard.didTapCharacter.sink { [weak self] in
             print("List Item has been clicked")
             guard let self, let character = self.characterCard.viewModel.character else { return }
             self.didSelectItem?(character)
         }
     }
-
-    override func setSelected(_ selected: Bool, animated: Bool) {
-        super.setSelected(selected, animated: animated)
-
-        // Configure the view for the selected state
-    }
-    
     
     func configureCellWithCharacter(_ characterViewModel: CharactersListItemViewModel) {
         characterCard.viewModel.character = characterViewModel
