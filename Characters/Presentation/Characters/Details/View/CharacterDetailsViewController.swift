@@ -14,17 +14,41 @@ class CharacterDetailsViewController: UIViewController {
     
     var character: CharacterModel?
     
+    // MARK: - Initialization
     convenience init(character: CharacterModel) {
         self.init()
         self.character = character
     }
     
+    override func loadView() {
+        // setup the root view programmatically
+        view = UIView()
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
          
+        setupCharacterCardView()
+    }
+     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        self.navigationController?.setNavigationBarHidden(true, animated: true)
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        self.navigationController?.setNavigationBarHidden(false, animated: true)
+    }
+    
+    //MARK: - Private Methods
+
+    private func setupCharacterCardView() {
+        // SwiftUI CharacterDetailsView
         let characterDetailsView = CharacterDetailsView(viewModel: .init(character: character))
         let characterCardView = UIHostingController(rootView: characterDetailsView)
        
+        // Embed the hosting controller
         addChild(characterCardView)
         characterCardView.view.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(characterCardView.view)
@@ -36,28 +60,5 @@ class CharacterDetailsViewController: UIViewController {
             characterCardView.view.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             characterCardView.view.centerYAnchor.constraint(equalTo: view.centerYAnchor)
         ])
-    }
-    
-    override func viewIsAppearing(_ animated: Bool) {
-        super.viewIsAppearing(animated)
-        
-        updateUI()
-    }
-     
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        self.navigationController?.setNavigationBarHidden(true, animated: true)
-    }
-    
-    override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-        
-        self.navigationController?.setNavigationBarHidden(false, animated: true)
-    }
-    
-    //MARK: - Private Methods
-
-    func updateUI() {
-        
     }
 }
